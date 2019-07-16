@@ -8,7 +8,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * Application main frame.
@@ -17,11 +20,6 @@ public class SorterFrame {
 
     public static final int FRAME_WIDTH = 850;
     public static final int FRAME_HEIGHT = 500;
-
-    /**
-     * Available choice options to select the sortable data amount
-     */
-    private static final String[] ELEMENTS_COUNTS = new String[] { "20", "40", "60", "80", "100", "200"};
 
     private static class SortActionListener implements ActionListener {
 
@@ -44,6 +42,11 @@ public class SorterFrame {
     private StatisticsPanel statisticsPanel;
     private List<StrategyImplementation> strategyImplementations;
 
+    /**
+     * Available choice options to select the sortable data amount
+     */
+    private List<Integer> dataSizes;
+
     public SorterFrame() {
         this.frame = new JFrame("Visual Sorter");
         this.frame.setLayout(new BorderLayout());
@@ -59,19 +62,34 @@ public class SorterFrame {
      * Creates and initializes all frame UI-components.
      */
     public void init() {
+        // Initialize sizes choice according to the configuration.
+        ResourceBundle configuration = ResourceBundle.getBundle("configuration");
+
+        String[] stringDataSizes = configuration.getString("sizes").split(",");
+        this.dataSizes = Arrays.stream(stringDataSizes)
+                .map(String::trim)
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
+
+        Integer initialSize = this.dataSizes.get(0);
+        if (configuration.containsKey("initialSize")) {
+            initialSize = Integer.valueOf(configuration.getString("initialSize"));
+        }
+
         this.labelDataPanel = new LabelDataPanel(this);
+        this.labelDataPanel.setDataSize(initialSize);
         this.labelDataPanel.rebuild();
         this.statisticsPanel = new StatisticsPanel();
 
         //
         // Element count ComboBox
         //
-        final JComboBox<String> elementComboBox = new JComboBox<>(ELEMENTS_COUNTS);
-        elementComboBox.setSelectedIndex(1);
+        final JComboBox<String> elementComboBox = new JComboBox<>(stringDataSizes);
+        elementComboBox.setSelectedIndex(this.dataSizes.indexOf(initialSize));
         elementComboBox.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int newSize = Integer.valueOf(ELEMENTS_COUNTS[elementComboBox.getSelectedIndex()]);
+                int newSize = SorterFrame.this.dataSizes.get(elementComboBox.getSelectedIndex());
                 SorterFrame.this.labelDataPanel.setDataSize(newSize);
                 SorterFrame.this.shuffle();
             }

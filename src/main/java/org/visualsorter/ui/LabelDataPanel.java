@@ -9,7 +9,6 @@ import java.util.Random;
  */
 public class LabelDataPanel extends JPanel implements LabelDataSource {
 
-    private static final int INITIAL_SIZE = 40;
     private static final Dimension MINIMUM_SIZE = new Dimension(200, 200);
 
     private SorterFrame parentFrame;
@@ -26,7 +25,6 @@ public class LabelDataPanel extends JPanel implements LabelDataSource {
         super(new FlowLayout(FlowLayout.CENTER, 0, 0));
         this.parentFrame = frame;
         setAlignmentY(Component.BOTTOM_ALIGNMENT);
-        setDataSize(INITIAL_SIZE);
         setMinimumSize(MINIMUM_SIZE);
         setPreferredSize(MINIMUM_SIZE);
     }
